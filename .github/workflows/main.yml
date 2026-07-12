@@ -1,6 +1,6 @@
 name: Wispbyte 自动重启
 
-on:
+'on':
   schedule:
     - cron: '20 3 * * *'
   workflow_dispatch:
@@ -18,8 +18,6 @@ jobs:
   restart:
     name: 执行重启脚本
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     steps:
       - name: 检出仓库
@@ -34,8 +32,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y xvfb ffmpeg unzip curl gnupg
-          wget -q -O /tmp/google-chrome-stable_current_amd64.deb \
-            https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          wget -q -O /tmp/google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo dpkg -i /tmp/google-chrome-stable_current_amd64.deb || sudo apt-get install -f -y
 
       - name: 安装 Python 依赖
@@ -55,4 +52,18 @@ jobs:
           WISPBYTE_2: ${{ secrets.WISPBYTE_2 }}
           WISPBYTE_3: ${{ secrets.WISPBYTE_3 }}
           WISPBYTE_4: ${{ secrets.WISPBYTE_4 }}
-          WISPBYTE_
+          WISPBYTE_5: ${{ secrets.WISPBYTE_5 }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+          INPUT_ACCOUNTS: ${{ inputs.accounts }}
+        run: python -u scripts/main.py
+
+      - name: 清理历史运行记录
+        if: always()
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          delete_workflow_pattern: ${{ github.workflow }}
+          retain_days: 0
+          keep_minimum_runs: 2
