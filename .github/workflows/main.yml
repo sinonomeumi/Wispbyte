@@ -1,6 +1,6 @@
 name: Wispbyte 自动重启
 
-'on':
+on:
   schedule:
     - cron: '20 3 * * *'
   workflow_dispatch:
@@ -57,13 +57,3 @@ jobs:
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           INPUT_ACCOUNTS: ${{ inputs.accounts }}
         run: python -u scripts/main.py
-
-      - name: 清理历史运行记录
-        if: always()
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          delete_workflow_pattern: ${{ github.workflow }}
-          retain_days: 0
-          keep_minimum_runs: 2
